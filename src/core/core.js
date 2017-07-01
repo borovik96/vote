@@ -11,3 +11,9 @@ export const next = (state) => {
     entries: entries.skip(2)
   });
 };
+
+export const vote = (state, entrie) => state.updateIn(
+  ['vote', 'tally', entrie],
+  0,
+  tally => tally + 1
+);
