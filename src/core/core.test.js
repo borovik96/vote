@@ -3,7 +3,13 @@ import { expect } from 'chai';
 
 import { setEntries, next, vote } from './core';
 
-const INITIAL_ENTRIES_LIST = ['Trainspotting', '28 Days Later', 'Sunshine'];
+const INITIAL_ENTRIES_LIST = [
+  'Trainspotting',
+  '28 Days Later',
+  'Sunshine',
+  'Millions',
+  '127 Hours'
+];
 describe('App logic', () => {
   describe('Set entries', () => {
     it('Add entries to state', () => {
@@ -27,6 +33,46 @@ describe('App logic', () => {
           pair: List(INITIAL_ENTRIES_LIST.slice(0, 2))
         }),
         entries: List(INITIAL_ENTRIES_LIST.slice(2))
+      }));
+    });
+
+    it('Move winner to the end of entries list and create new pair', () => {
+      const state = Map({
+        vote: Map({
+          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+          tally: Map({
+            [INITIAL_ENTRIES_LIST[0]]: 4,
+            [INITIAL_ENTRIES_LIST[1]]: 2
+          })
+        }),
+        entries: List(INITIAL_ENTRIES_LIST.slice(2))
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        vote: Map({
+          pair: List(INITIAL_ENTRIES_LIST.slice(2, 4))
+        }),
+        entries: List([...INITIAL_ENTRIES_LIST.slice(4), INITIAL_ENTRIES_LIST[0]])
+      }));
+    });
+
+    it('Move both entries to the end of entries list if draft game', () => {
+      const state = Map({
+        vote: Map({
+          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+          tally: Map({
+            [INITIAL_ENTRIES_LIST[0]]: 4,
+            [INITIAL_ENTRIES_LIST[1]]: 4
+          })
+        }),
+        entries: List(INITIAL_ENTRIES_LIST.slice(2))
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        vote: Map({
+          pair: List(INITIAL_ENTRIES_LIST.slice(2, 4))
+        }),
+        entries: List([...INITIAL_ENTRIES_LIST.slice(4), ...INITIAL_ENTRIES_LIST.slice(0, 2)])
       }));
     });
   });
