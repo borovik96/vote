@@ -48,11 +48,12 @@ describe('App logic', () => {
         entries: List(INITIAL_ENTRIES_LIST.slice(2))
       });
       const nextState = next(state);
+      const newList = [...INITIAL_ENTRIES_LIST.slice(2), INITIAL_ENTRIES_LIST[0]];
       expect(nextState).to.equal(Map({
         vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(2, 4))
+          pair: List(newList.slice(0, 2))
         }),
-        entries: List([...INITIAL_ENTRIES_LIST.slice(4), INITIAL_ENTRIES_LIST[0]])
+        entries: List(newList.slice(2))
       }));
     });
 
@@ -68,56 +69,62 @@ describe('App logic', () => {
         entries: List(INITIAL_ENTRIES_LIST.slice(2))
       });
       const nextState = next(state);
+      const newList = [...INITIAL_ENTRIES_LIST.slice(2), ...INITIAL_ENTRIES_LIST.slice(0, 2)];
       expect(nextState).to.equal(Map({
         vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(2, 4))
+          pair: List(newList.slice(0, 2))
         }),
-        entries: List([...INITIAL_ENTRIES_LIST.slice(4), ...INITIAL_ENTRIES_LIST.slice(0, 2)])
+        entries: List(newList.slice(2))
+      }));
+    });
+
+    it('Set winner if there is only one entrie', () => {
+      const state = Map({
+        vote: Map({
+          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+          tally: Map({
+            [INITIAL_ENTRIES_LIST[0]]: 2,
+            [INITIAL_ENTRIES_LIST[1]]: 1
+          })
+        }),
+        entries: List()
+      });
+      const nextState = next(state);
+      expect(nextState).to.equal(Map({
+        winner: INITIAL_ENTRIES_LIST[0]
       }));
     });
   });
 
-  describe('vote', () => {
+  describe('Voting', () => {
     it('Create result of voting', () => {
       const state = Map({
-        vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2))
-        }),
-        entries: List()
+        pair: List(INITIAL_ENTRIES_LIST.slice(0, 2))
       });
       const nextState = vote(state, INITIAL_ENTRIES_LIST[0]);
       expect(nextState).to.equal(Map({
-        vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
-          tally: Map({
-            [INITIAL_ENTRIES_LIST[0]]: 1
-          })
-        }),
-        entries: List()
+        pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+        tally: Map({
+          [INITIAL_ENTRIES_LIST[0]]: 1
+        })
       }));
     });
 
     it('Update exist result of voting', () => {
       const state = Map({
-        vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
-          tally: Map({
-            [INITIAL_ENTRIES_LIST[0]]: 2,
-            [INITIAL_ENTRIES_LIST[1]]: 3
-          })
-        }),
-        entries: List()
+        pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+        tally: Map({
+          [INITIAL_ENTRIES_LIST[0]]: 2,
+          [INITIAL_ENTRIES_LIST[1]]: 3
+        })
       });
       const nextState = vote(state, INITIAL_ENTRIES_LIST[1]);
       expect(nextState).to.equal(Map({
-        vote: Map({
-          pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
-          tally: Map({
-            [INITIAL_ENTRIES_LIST[0]]: 2,
-            [INITIAL_ENTRIES_LIST[1]]: 4
-          })
-        }),
-        entries: List()
+        pair: List(INITIAL_ENTRIES_LIST.slice(0, 2)),
+        tally: Map({
+          [INITIAL_ENTRIES_LIST[0]]: 2,
+          [INITIAL_ENTRIES_LIST[1]]: 4
+        })
       }));
     });
   });
